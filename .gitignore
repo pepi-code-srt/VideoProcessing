@@ -1,0 +1,12 @@
+# Ignore model files
+*.pt
+
+# Ignore environment variables
+.env
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore uploads (if user files should be private)
+uploads/
