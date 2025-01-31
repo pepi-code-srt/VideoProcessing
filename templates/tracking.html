@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracking</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 1200px;
+            background-color: #2e2e2e;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        #video-frame {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #ff6600;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live Tracking</h1>
+        <img id="video-frame" class="img-fluid img-thumbnail" src="">
+        <p id="estimated-time"></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('frame', function (data) {
+            const videoFrame = document.getElementById('video-frame');
+            videoFrame.src = 'data:image/png;base64,' + data.frame;
+        });
+
+        socket.on('estimated_time', function (data) {
+            const estimatedTime = document.getElementById('estimated-time');
+            estimatedTime.textContent = `Estimated time remaining: ${data.time_remaining.toFixed(2)} seconds`;
+  });
+
+        socket.on('result', function (result) {
+            localStorage.setItem('videoResult', JSON.stringify(result));
+            window.location.href = "/result";
+        });
+    </script>
+</body>
+</html>

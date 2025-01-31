@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            max-width: 1200px;
+            background-color: #2e2e2e;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .chart-container {
+            margin-bottom: auto;
+        }
+        .table-container {
+            margin-bottom: auto;
+        }
+        .segmented-images {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .segmented-images img {
+            width: auto;
+            height: 250px;
+            margin: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #ff6600;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Results</h1>
+        <div class="row chart-container">
+            <div class="col-12">
+                <canvas id="object-chart"></canvas>
+            </div>
+        </div>
+        <div class="row table-container">
+            <div class="col-12">
+                <table class="table table-dark table-striped">
+                    <tr>
+                        <th>Total Frames</th><td id="total-frames"></td>
+                    </tr>
+                    <tr>
+                        <th>FPS</th><td id="fps"></td>
+                    </tr>
+                    <tr>
+                        <th>Duration (seconds)</th><td id="duration"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row segmented-images" id="segmented-images"></div>
+        <button id="restart-button" class="button">Restart</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        document.getElementById('restart-button').addEventListener('click', function () {
+            window.location.href = "/";
+        });
+
+        const result = JSON.parse(localStorage.getItem('videoResult'));
+        if (result) {
+            const labels = Object.keys(result.object_counts);
+            const data = Object.values(result.object_counts);
+            const ctx = document.getElementById('object-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Object Count',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('total-frames').textContent = result.total_frames;
+            document.getElementById('fps').textContent = result.fps;
+            document.getElementById('duration').textContent = (result.total_frames / result.fps).toFixed(2);
+
+            const segmentedImagesDiv = document.getElementById('segmented-images');
+            segmentedImagesDiv.innerHTML = '';
+            for (const [object, image] of Object.entries(result.segmented_images)) {
+                const img = document.createElement('img');
+                img.src = 'data:image/png;base64,' + image;
+                img.alt = object;
+                img.className = 'img-thumbnail';
+                segmentedImagesDiv.appendChild(img);
+            }
+
+            // Add tooltip for segmented images
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
