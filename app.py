@@ -65,5 +65,5 @@ def process_video_with_progress(filepath, confidence_threshold):
         socketio.emit('result', {"error": "An error occurred during video processing."})
 
 if __name__ == "__main__":
-    from waitress import serve
-    serve(app, host="0.0.0.0", port=8080)
+    print("Starting server on http://localhost:8080")
+    socketio.run(app, host="0.0.0.0", port=8080)
